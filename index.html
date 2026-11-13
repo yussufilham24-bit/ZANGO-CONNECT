@@ -1,0 +1,531 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#101326">
+<meta name="description" content="ZANGO CONNECT - One World. One Connection.">
+<link rel="manifest" href="manifest.json">
+<title>ZANGO CONNECT</title>
+
+<style>
+:root{
+--bg:#0c1020;
+--panel:#151a30;
+--text:#f5f7ff;
+--muted:#9ba5c4;
+--line:#293150;
+--accent:#8b6cff;
+--cyan:#39d5e8;
+--green:#39d99a;
+}
+
+*{box-sizing:border-box}
+
+body{
+margin:0;
+background:var(--bg);
+color:var(--text);
+font-family:Arial,sans-serif;
+}
+
+.app{
+max-width:520px;
+min-height:100vh;
+margin:auto;
+padding:15px 16px 95px;
+}
+
+header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:12px 0 20px;
+}
+
+.brand{
+display:flex;
+align-items:center;
+gap:10px;
+}
+
+.logo{
+width:43px;
+height:43px;
+border-radius:15px;
+background:linear-gradient(135deg,var(--accent),var(--cyan));
+display:grid;
+place-items:center;
+font-weight:bold;
+font-size:23px;
+}
+
+.brand h2{
+font-size:16px;
+letter-spacing:1px;
+margin:0;
+}
+
+.brand small{
+color:var(--muted);
+font-size:9px;
+}
+
+.iconbtn{
+background:var(--panel);
+color:white;
+border:1px solid var(--line);
+padding:12px;
+border-radius:13px;
+}
+
+.welcome{
+padding:22px;
+border-radius:23px;
+background:linear-gradient(120deg,#302450,#153746);
+}
+
+.welcome small{
+color:#c4b6ff;
+letter-spacing:2px;
+}
+
+.welcome h1{
+font-size:25px;
+line-height:1.2;
+}
+
+.welcome p{
+color:#c2c9df;
+font-size:13px;
+line-height:1.6;
+}
+
+.search{
+margin-top:20px;
+background:var(--panel);
+border:1px solid var(--line);
+padding:15px;
+border-radius:15px;
+display:flex;
+gap:10px;
+}
+
+.search input{
+background:none;
+border:none;
+outline:none;
+color:var(--text);
+width:100%;
+}
+
+.section{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin:25px 0 15px;
+}
+
+.section h3{
+font-size:16px;
+margin:0;
+}
+
+.muted{
+color:var(--muted);
+font-size:11px;
+}
+
+.quick{
+display:flex;
+gap:16px;
+overflow-x:auto;
+}
+
+.quick-item{
+min-width:58px;
+text-align:center;
+font-size:11px;
+color:var(--muted);
+}
+
+.avatar{
+width:52px;
+height:52px;
+border-radius:18px;
+margin:auto auto 7px;
+display:grid;
+place-items:center;
+font-weight:bold;
+background:linear-gradient(135deg,#6653a9,#287f91);
+position:relative;
+}
+
+.online{
+position:absolute;
+width:11px;
+height:11px;
+background:var(--green);
+border:2px solid var(--bg);
+border-radius:50%;
+right:0;
+bottom:0;
+}
+
+.chat{
+display:flex;
+align-items:center;
+gap:12px;
+padding:13px 5px;
+border-bottom:1px solid var(--line);
+}
+
+.chat .avatar{
+margin:0;
+flex-shrink:0;
+}
+
+.chat-info{
+flex:1;
+min-width:0;
+}
+
+.chat-top{
+display:flex;
+justify-content:space-between;
+gap:8px;
+}
+
+.chat-name{
+font-weight:bold;
+font-size:14px;
+}
+
+.time{
+font-size:10px;
+color:var(--muted);
+}
+
+.preview{
+font-size:12px;
+color:var(--muted);
+margin-top:6px;
+white-space:nowrap;
+overflow:hidden;
+text-overflow:ellipsis;
+}
+
+.unread{
+background:var(--accent);
+border-radius:20px;
+padding:4px 7px;
+font-size:10px;
+}
+
+.page{display:none}
+.page.active{display:block}
+
+.empty{
+padding:45px 20px;
+text-align:center;
+background:var(--panel);
+border-radius:20px;
+color:var(--muted);
+line-height:1.7;
+}
+
+.profile{
+background:var(--panel);
+padding:30px;
+border-radius:22px;
+text-align:center;
+}
+
+.profile-avatar{
+width:75px;
+height:75px;
+margin:auto auto 15px;
+border-radius:25px;
+display:grid;
+place-items:center;
+font-size:25px;
+font-weight:bold;
+background:linear-gradient(135deg,var(--accent),var(--cyan));
+}
+
+nav{
+position:fixed;
+bottom:0;
+left:50%;
+transform:translateX(-50%);
+width:100%;
+max-width:520px;
+background:#11162a;
+border-top:1px solid var(--line);
+display:grid;
+grid-template-columns:repeat(5,1fr);
+padding:12px 5px calc(12px + env(safe-area-inset-bottom));
+}
+
+nav button{
+background:none;
+border:none;
+color:var(--muted);
+font-size:10px;
+display:flex;
+flex-direction:column;
+align-items:center;
+gap:5px;
+}
+
+nav button span{
+font-size:20px;
+}
+
+nav button.active{
+color:#b9aaff;
+}
+
+.light{
+--bg:#f4f6ff;
+--panel:#fff;
+--text:#171b32;
+--muted:#68718f;
+--line:#dfe3f3;
+}
+
+.light nav{
+background:#fff;
+}
+
+.light .iconbtn{
+color:#171b32;
+}
+
+@media(min-width:600px){
+body{padding:20px 0}
+.app{
+border:1px solid var(--line);
+border-radius:25px;
+}
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<header>
+<div class="brand">
+<div class="logo">Z</div>
+<div>
+<h2>ZANGO CONNECT</h2>
+<small>ONE WORLD. ONE CONNECTION.</small>
+</div>
+</div>
+
+<button class="iconbtn" id="themeBtn">☼</button>
+</header>
+
+<main>
+
+<section class="page active" id="chats">
+
+<div class="welcome">
+<small>WELCOME TO YOUR WORLD</small>
+<h1>Every connection starts here.</h1>
+<p>Bring your people closer. Chat, share and stay connected across the world.</p>
+</div>
+
+<div class="search">
+⌕
+<input id="searchInput" placeholder="Search conversations...">
+</div>
+
+<div class="section">
+<h3>Quick connect</h3>
+<span class="muted">Your people</span>
+</div>
+
+<div class="quick">
+
+<div class="quick-item">
+<div class="avatar">＋</div>
+Add
+</div>
+
+<div class="quick-item">
+<div class="avatar">AH<span class="online"></span></div>
+Amina
+</div>
+
+<div class="quick-item">
+<div class="avatar">JA<span class="online"></span></div>
+Jamal
+</div>
+
+<div class="quick-item">
+<div class="avatar">SK</div>
+Sarah
+</div>
+
+<div class="quick-item">
+<div class="avatar">DM<span class="online"></span></div>
+Daniel
+</div>
+
+</div>
+
+<div class="section">
+<h3>Messages</h3>
+<span class="muted">Recent chats</span>
+</div>
+
+<div id="chatList">
+
+<div class="chat" data-name="amina hassan">
+<div class="avatar">AH</div>
+<div class="chat-info">
+<div class="chat-top">
+<span class="chat-name">Amina Hassan</span>
+<span class="time">Now</span>
+</div>
+<div class="preview">That sounds amazing! Let's do it ✨</div>
+</div>
+<span class="unread">2</span>
+</div>
+
+<div class="chat" data-name="jamal ali">
+<div class="avatar">JA</div>
+<div class="chat-info">
+<div class="chat-top">
+<span class="chat-name">Jamal Ali</span>
+<span class="time">9:42 PM</span>
+</div>
+<div class="preview">Voice message · 0:18</div>
+</div>
+</div>
+
+<div class="chat" data-name="zango creators">
+<div class="avatar">ZC</div>
+<div class="chat-info">
+<div class="chat-top">
+<span class="chat-name">ZANGO Creators</span>
+<span class="time">Yesterday</span>
+</div>
+<div class="preview">Mariam: Shared a new photo</div>
+</div>
+</div>
+
+<div class="chat" data-name="sarah kim">
+<div class="avatar">SK</div>
+<div class="chat-info">
+<div class="chat-top">
+<span class="chat-name">Sarah Kim</span>
+<span class="time">Yesterday</span>
+</div>
+<div class="preview">See you tomorrow 👋</div>
+</div>
+</div>
+
+</div>
+</section>
+
+<section class="page" id="updates">
+<div class="section"><h3>Updates</h3></div>
+<div class="empty">
+<h3>Your world, in moments.</h3>
+Status updates will appear here.
+</div>
+</section>
+
+<section class="page" id="calls">
+<div class="section"><h3>Calls</h3></div>
+<div class="empty">
+<h3>Stay close.</h3>
+Voice and video calls will be added in a later stage.
+</div>
+</section>
+
+<section class="page" id="communities">
+<div class="section"><h3>Communities</h3></div>
+<div class="empty">
+<h3>Find your people.</h3>
+Create and join communities around the things you love.
+</div>
+</section>
+
+<section class="page" id="profile">
+<div class="section"><h3>Your Profile</h3></div>
+<div class="profile">
+<div class="profile-avatar">ZC</div>
+<h3>ZANGO CONNECT</h3>
+<p class="muted">Your connection journey starts here.</p>
+</div>
+</section>
+
+</main>
+
+<nav>
+<button class="active" data-page="chats">
+<span>▤</span>Chats
+</button>
+
+<button data-page="updates">
+<span>◉</span>Updates
+</button>
+
+<button data-page="calls">
+<span>⌕</span>Calls
+</button>
+
+<button data-page="communities">
+<span>◎</span>Communities
+</button>
+
+<button data-page="profile">
+<span>♙</span>Profile
+</button>
+</nav>
+
+</div>
+
+<script>
+const navButtons=document.querySelectorAll("nav button");
+
+navButtons.forEach(btn=>{
+btn.addEventListener("click",()=>{
+navButtons.forEach(b=>b.classList.remove("active"));
+btn.classList.add("active");
+
+document.querySelectorAll(".page").forEach(page=>{
+page.classList.remove("active");
+});
+
+document.getElementById(btn.dataset.page).classList.add("active");
+});
+});
+
+document.getElementById("themeBtn").onclick=()=>{
+document.body.classList.toggle("light");
+};
+
+document.getElementById("searchInput").oninput=e=>{
+const q=e.target.value.toLowerCase();
+
+document.querySelectorAll(".chat").forEach(chat=>{
+chat.style.display=chat.dataset.name.includes(q)?"flex":"none";
+});
+};
+</script>
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/sw.js");
+  });
+}
+</script>
+</body>
+</html>
