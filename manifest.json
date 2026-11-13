@@ -1,0 +1,13 @@
+
+{
+  "name": "ZANGO CONNECT",
+  "short_name": "CONNECT",
+  "description": "One World. One Connection.",
+  "lang": "en",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0c1020",
+  "theme_color": "#101326"
+}
