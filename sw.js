@@ -1,4 +1,5 @@
-const CACHE_NAME = "zango-connect-v1";
+
+const CACHE_NAME = "zango-connect-v2";
 
 const FILES = [
   "/",
@@ -9,7 +10,8 @@ const FILES = [
 // INSTALL
 self.addEventListener("install", event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(FILES))
+    caches.open(CACHE_NAME)
+      .then(cache => cache.addAll(FILES))
   );
 
   self.skipWaiting();
@@ -24,30 +26,45 @@ self.addEventListener("activate", event => {
           .filter(key => key !== CACHE_NAME)
           .map(key => caches.delete(key))
       )
-    )
+    ).then(() => self.clients.claim())
   );
-
-  self.clients.claim();
 });
 
-// FETCH - EXISTING OFFLINE CACHE
+// FETCH - OFFLINE SUPPORT
 self.addEventListener("fetch", event => {
-  if (event.request.method !== "GET") return;
+  const request = event.request;
+
+  if (request.method !== "GET") return;
+
+  const url = new URL(request.url);
+
+  // Cache app origin pekee
+  if (url.origin !== self.location.origin) return;
 
   event.respondWith(
-    fetch(event.request).then(response => {
-      const copy = response.clone();
+    fetch(request)
+      .then(response => {
+        if (response.ok) {
+          const copy = response.clone();
 
-      caches.open(CACHE_NAME).then(cache =>
-        cache.put(event.request, copy)
-      );
+          caches.open(CACHE_NAME).then(cache => {
+            cache.put(request, copy);
+          });
+        }
 
-      return response;
-    }).catch(() =>
-      caches.match(event.request).then(cached =>
-        cached || caches.match("/index.html")
-      )
-    )
+        return response;
+      })
+      .catch(async () => {
+        const cached = await caches.match(request);
+
+        if (cached) return cached;
+
+        if (request.mode === "navigate") {
+          return caches.match("/index.html");
+        }
+
+        return Response.error();
+      })
   );
 });
 
@@ -63,16 +80,55 @@ self.addEventListener("push", event => {
     };
   }
 
-  const title = data.title || "ZANGO CONNECT";
+  // Support payload yenye notification object pia
+  const notificationData = data.notification || data;
+
+  const title =
+    notificationData.title ||
+    data.title ||
+    "ZANGO CONNECT";
+
+  const body =
+    notificationData.body ||
+    data.body ||
+    "Una ujumbe mpya.";
+
+  const messageId = data.messageId || data.message_id || "";
+  const conversationId =
+    data.conversationId || data.conversation_id || "";
+
+  const notificationTag =
+    data.tag ||
+    (messageId
+      ? "zango-message-" + messageId
+      : "zango-" + Date.now());
 
   const options = {
-    body: data.body || "Una notification mpya.",
-    tag: data.tag || "zango-connect-notification",
+    body: body,
+    tag: notificationTag,
+    renotify: true,
+    timestamp: Date.now(),
     data: {
-      url: data.url || "/"
-    },
-    renotify: true
+      url: data.url || notificationData.url || "/",
+      conversationId: conversationId,
+      messageId: messageId
+    }
   };
+
+  // Avatar ya mtumaji
+  if (notificationData.icon || data.icon) {
+    options.icon = notificationData.icon || data.icon;
+  }
+
+  // Picha ya ujumbe ikiwa ipo
+  if (notificationData.image || data.image) {
+    options.image = notificationData.image || data.image;
+  }
+
+  // Badge ikiwa ipo
+  if (notificationData.badge || data.badge) {
+    options.badge = notificationData.badge || data.badge;
+  }
 
   event.waitUntil(
     self.registration.showNotification(title, options)
@@ -83,12 +139,17 @@ self.addEventListener("push", event => {
 self.addEventListener("notificationclick", event => {
   event.notification.close();
 
-  const targetUrl = new URL(
-    event.notification.data?.url || "/",
-    self.location.origin
-  );
+  const rawUrl = event.notification.data?.url || "/";
 
-  // Ruhusu kufungua ukurasa wa ndani ya app pekee
+  let targetUrl;
+
+  try {
+    targetUrl = new URL(rawUrl, self.location.origin);
+  } catch (error) {
+    targetUrl = new URL("/", self.location.origin);
+  }
+
+  // Ruhusu URL za app yetu pekee
   const safeUrl =
     targetUrl.origin === self.location.origin
       ? targetUrl.href
@@ -98,15 +159,17 @@ self.addEventListener("notificationclick", event => {
     self.clients.matchAll({
       type: "window",
       includeUncontrolled: true
-    }).then(clientList => {
+    }).then(async clientList => {
 
+      // Tumia app iliyopo kama imefunguliwa
       for (const client of clientList) {
         if (client.url.startsWith(self.location.origin)) {
-          client.navigate(safeUrl);
+          await client.navigate(safeUrl);
           return client.focus();
         }
       }
 
+      // Fungua app ikiwa hakuna window iliyopo
       return self.clients.openWindow(safeUrl);
     })
   );
